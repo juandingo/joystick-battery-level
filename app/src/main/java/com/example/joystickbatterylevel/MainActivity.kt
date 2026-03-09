@@ -28,7 +28,8 @@ import androidx.core.graphics.toColorInt
 class MainActivity : AppCompatActivity() {
 
     private val requestBluetooth = 1
-    private val macAddress = ""
+    private val macAddress = BuildConfig.JOYSTICK_MAC_ADDRESS
+    private val joystickDisplayName = BuildConfig.DEVICE_NAME_DISPLAY
     private val batteryServiceUuid = UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb")
     private val batteryLevelUuid = UUID.fromString("00002A19-0000-1000-8000-00805f9b34fb")
     private val deviceInfoServiceUuid = UUID.fromString("0000180A-0000-1000-8000-00805f9b34fb")
@@ -107,7 +108,8 @@ class MainActivity : AppCompatActivity() {
             val isBtEnabled = bluetoothAdapter?.isEnabled == true
 
             if (isConnected) {
-                deviceNameText.text = "GameSir Nova Lite"
+
+                deviceNameText.text = joystickDisplayName
                 bluetoothIcon.setImageResource(R.drawable.outline_bluetooth_connected_24)
                 bluetoothIcon.alpha = 1.0f
             } else {
