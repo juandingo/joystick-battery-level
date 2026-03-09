@@ -255,7 +255,7 @@ class MainActivity : AppCompatActivity() {
                         val firmwareChar = infoService?.getCharacteristic(firmwareRevisionUuid)
 
                         if (firmwareChar != null) {
-                            readCharacteristicWithDelay(gatt, firmwareChar, 100)
+                            readCharacteristicWithDelay(gatt, firmwareChar, 400)
                         }
                     }
 
@@ -276,7 +276,7 @@ class MainActivity : AppCompatActivity() {
         private fun readBattery(gatt: BluetoothGatt) {
             val service = gatt.getService(batteryServiceUuid)
             val char = service?.getCharacteristic(batteryLevelUuid)
-            if (char != null) readCharacteristicWithDelay(gatt, char, 100)
+            if (char != null) readCharacteristicWithDelay(gatt, char, 400)
         }
 
         private fun readCharacteristicWithDelay(gatt: BluetoothGatt, char: BluetoothGattCharacteristic, delay: Long) {
