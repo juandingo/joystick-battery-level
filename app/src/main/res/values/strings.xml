@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Joystick Battery Level</string>
+    <string name="xx">XX</string>
+    <string name="icono_bluetooth">icono bluetooth</string>
+    <string name="icono_de_la_bateria">icono de la bateria</string>
+    <string name="gamesir_nova_lite">GameSir Nova Lite</string>
+    <string name="desconectado">Desconectado</string>
+    <string name="defaultBattLevel">--%</string>
+    <string name="nivel_de_bater_a">Nivel de batería</string>
+    <string name="app_v1_0">App: V1.0</string>
+    <string name="firmware">Firmware: --</string>
+    <string name="DefaultBTstatusText">Desconectado</string>
+    <string name="batteryLevelText">Nivel de batería</string>
+    <string name="appVerText">App v1.0</string>
+</resources>
