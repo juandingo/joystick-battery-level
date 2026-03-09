@@ -2,28 +2,20 @@ package com.example.joystickbatterylevel
 
 import android.Manifest
 import android.bluetooth.*
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.os.*
+import android.widget.*
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.util.UUID
-import androidx.core.graphics.toColorInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,12 +34,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bluetoothIcon: ImageView
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private var bluetoothGatt: BluetoothGatt? = null
-
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
         val manager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         manager.adapter
     }
-
     private val bluetoothStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
@@ -165,10 +155,11 @@ class MainActivity : AppCompatActivity() {
                 if (connectingAnimation) {
                     stopConnectingAnimation()
                     updateConnectionUI("Error al conectar", false)
+                    Toast.makeText(this, "Dispositivo fuera de alcance", Toast.LENGTH_SHORT).show()
                     swipeRefresh.isRefreshing = false
                     bluetoothGatt?.close()
                 }
-            }, 10000)
+            }, 8000)
 
         } catch (_: Exception) {
             stopConnectingAnimation()
@@ -247,29 +238,30 @@ class MainActivity : AppCompatActivity() {
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                val infoService = gatt.getService(deviceInfoServiceUuid)
-                val firmwareChar = infoService?.getCharacteristic(firmwareRevisionUuid)
-
-                if (firmwareChar != null) {
-                    readCharacteristicWithDelay(gatt, firmwareChar, 100)
-                } else {
-                    readBattery(gatt)
-                }
+                readBattery(gatt)
             }
         }
 
         override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 when (characteristic.uuid) {
-                    firmwareRevisionUuid -> {
-                        val version = String(characteristic.value)
-                        runOnUiThread { firmwareText.text = "Firmware: $version" }
-                        readBattery(gatt)
-                    }
+
                     batteryLevelUuid -> {
                         val level = characteristic.value[0].toInt() and 0xFF
                         updateBatteryUI(level)
                         enableNotifications(gatt, characteristic)
+
+                        val infoService = gatt.getService(deviceInfoServiceUuid)
+                        val firmwareChar = infoService?.getCharacteristic(firmwareRevisionUuid)
+
+                        if (firmwareChar != null) {
+                            readCharacteristicWithDelay(gatt, firmwareChar, 100)
+                        }
+                    }
+
+                    firmwareRevisionUuid -> {
+                        val version = String(characteristic.value)
+                        runOnUiThread { firmwareText.text = "Firmware: $version" }
                     }
                 }
             }
@@ -284,7 +276,7 @@ class MainActivity : AppCompatActivity() {
         private fun readBattery(gatt: BluetoothGatt) {
             val service = gatt.getService(batteryServiceUuid)
             val char = service?.getCharacteristic(batteryLevelUuid)
-            if (char != null) readCharacteristicWithDelay(gatt, char, 500)
+            if (char != null) readCharacteristicWithDelay(gatt, char, 100)
         }
 
         private fun readCharacteristicWithDelay(gatt: BluetoothGatt, char: BluetoothGattCharacteristic, delay: Long) {
@@ -317,5 +309,4 @@ class MainActivity : AppCompatActivity() {
             bluetoothGatt?.close()
         }
     }
-
 }
